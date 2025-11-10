@@ -5,6 +5,8 @@ import time
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+import re
+
 
 
 load_dotenv()
@@ -342,6 +344,23 @@ def update_readme_with_output(output_text):
     readme_path.write_text(content)
     print("\n✅ README.md updated with latest output!\n")
 
+def update_readme(result):
+    readme_path = Path("README.md")
+    # Read existing content
+    if readme_path.exists():
+        content = readme_path.read_text()
+    else:
+        content = "# AutoGen Demo Project\n\n"
+
+    # Replace or append dynamic section
+    new_section = f"\n## Latest AutoGen Output\n```\n{result['output'] if result['worked'] else result['error']}\n```\n"
+    
+    # Remove old Latest AutoGen Output section if exists
+    content = re.sub(r"\n## Latest AutoGen Output\n```.*?```\n", "", content, flags=re.DOTALL)
+    
+    # Append new section
+    content += new_section
+    readme_path.write_text(content)
 
 def main():
     """Run the whole demo."""
@@ -424,7 +443,7 @@ def custom_mode():
         else:
             print(f"❌ Error: {result['error']}")
         print("="*60)
-        
+        update_readme(result)
         update_readme_with_output(result['output'] if result['worked'] else result['error'])
 
 
