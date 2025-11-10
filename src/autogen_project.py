@@ -4,6 +4,8 @@ import sys
 import time
 import os
 from dotenv import load_dotenv
+from pathlib import Path
+
 
 load_dotenv()
 GROQ_KEY = os.getenv("GROQ_KEY")
@@ -312,6 +314,34 @@ def show_intro():
     print("\nUsing: Groq (free & super fast) + Llama 3.1")
     print("="*60)
 
+def update_readme_with_output(output_text):
+    """
+    Appends or updates the latest AutoGen output in README.md.
+    """
+    readme_path = Path(__file__).parent / "README.md"
+
+    if not readme_path.exists():
+        # If README doesn't exist, create a simple one
+        readme_path.write_text("# AutoGen Demo Project\n\n## Latest Output\n")
+    
+    content = readme_path.read_text()
+
+    # Add/update the section for latest output
+    start_marker = "<!-- AUTO_GEN_OUTPUT_START -->"
+    end_marker = "<!-- AUTO_GEN_OUTPUT_END -->"
+
+    new_section = f"{start_marker}\n```\n{output_text}\n```\n{end_marker}"
+
+    if start_marker in content and end_marker in content:
+        # Replace existing output
+        content = content.split(start_marker)[0] + new_section
+    else:
+        # Append at the end
+        content += f"\n\n## Latest Output\n{new_section}\n"
+
+    readme_path.write_text(content)
+    print("\n✅ README.md updated with latest output!\n")
+
 
 def main():
     """Run the whole demo."""
@@ -394,6 +424,8 @@ def custom_mode():
         else:
             print(f"❌ Error: {result['error']}")
         print("="*60)
+        
+        update_readme_with_output(result['output'] if result['worked'] else result['error'])
 
 
 if __name__ == "__main__":
