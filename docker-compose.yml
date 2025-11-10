@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  autogen-demo:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+      - ./coding_output:/app/coding_output
+    command: ["python", "src/autogen_project.py"]
