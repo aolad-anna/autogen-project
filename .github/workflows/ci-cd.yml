@@ -7,6 +7,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:  # Allows manual trigger
 
+permissions:
+  contents: write  # Allow pushing changes back to repo
+
 jobs:
   run-autogen:
     runs-on: ubuntu-latest
@@ -28,8 +31,16 @@ jobs:
         pip install groq python-dotenv
     
     - name: Create .env file
+      env:
+        GROQ_KEY: ${{ secrets.GROQ_KEY }}
       run: |
-        echo "GROQ_KEY=${{ secrets.GROQ_KEY }}" > .env
+        if [ -z "$GROQ_KEY" ]; then
+          echo "❌ Error: GROQ_KEY secret is not set!"
+          echo "Please add your Groq API key to GitHub Secrets"
+          exit 1
+        fi
+        echo "GROQ_KEY=$GROQ_KEY" > .env
+        echo "✅ Environment file created"
     
     - name: Run AutoGen Script
       id: run_script
