@@ -46,7 +46,7 @@ jobs:
       id: run_script
       run: |
         echo "Starting AutoGen execution..."
-        python autogen_project.py > autogen_output.txt 2>&1 || true
+        python src/autogen_project.py > autogen_output.txt 2>&1 || true
         echo "Script execution completed"
         
     - name: Display output
